@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<style>
+	*{
+		margin:0;
+		padding: 0;
+	}
+		#box{
+			width: 400px;
+			height: 400px;
+			background: #ed9121;
+			position: absolute;
+		}
+		.sheshen{
+			width: 8px;
+			height: 8px;
+			background: green;
+			position: absolute;
+			border-radius: 4px;
+			top: 196px;
+			left: 196px;
+		}
+		.shetou{
+			background: #6a5acd;
+		z-index:100;
+		}
+		#over{
+			width: 350px;
+			height: 100px;
+			color: #00ffff;
+			z-index: 10;
+			position: absolute;
+			left: 0px;
+			top: 100px;
+			text-align: center;
+			font-size: 18px;
+			border: 2px solid green;
+			/*line-height: 30px;*/
+			border-radius: 0 10px 10px 10px;
+			display: none;
+		}
+		#over button{
+			background: green;
+			border-radius: 10px;
+			width: 50px;
+			color: white;
+		}
+		#fenshu{
+			width: 20px;
+			height: 100px;
+			background: #ff0;
+			position: absolute;
+			left: 400px;
+			text-align: center;
+		}
+		a{
+			text-decoration: none;
+			color: white;
+		}
+	</style>
+</head>
+<body>
+	<div id="box">
+		<div id="she">
+			<div class="sheshen shetou"></div>
+			<div class="sheshen"></div>
+			<div class="sheshen"></div>
+			<div class="sheshen"></div>
+		</div>
+	</div>
+	<div id="fenshu">当前分数0</div>
+	<div id="over">Game over
+	<br>真不幸，您的撞到了墙上，头破血流，请下次继续努力
+	<br><button id="next">再来一次</button><button id="out"><a href="https://www.baidu.com/">退出游戏</a></button>
+	</div>
+	
+	<script type="text/javascript">
+		function my$(id) {
+			// body...封装函数返回id。
+			return document.getElementById(id);
+		}
+		var box=my$("box");
+		var she=my$("she");
+		var over=my$("over");
+		var next=my$("next");
+		var out=my$("out");
+		var fenshu=my$("fenshu");
+		// 得到Id为she的div的子div
+		var sheshens=she.getElementsByTagName('div');
+		// shepos为蛇身的坐标定位
+		var sheposl=["196","196","196","196"];
+		var shepost=["196","196","196","196"];
+		// diyi布尔值
+		var diyi=false;
+		// st，sl起始位置坐标
+		var st=196;
+		var sl=196;
+		// time声明定时器变量
+		var time;
+		var fen=0;
+		// 封装函数随机产生一个绿色圆点
+		function suiji () {
+			// body...
+			// 随机产生绿色圆点的坐标
+			suijil=Math.random() * 400;
+			suijit=Math.random() * 400;
+			// 创建一个新的div元素节点newdiv
+			newdiv = document.createElement("div");
+			box.appendChild(newdiv);
+			newdiv.style.left=suijil-4+"px";
+			newdiv.style.top=suijit-4+"px";
+			newdiv.className="sheshen";
+
+			}
+			// 调用随机函数
+		suiji();
+		// 黄色区域点击事件
+box.onclick=function (event) {
+	// body...
+// 布尔值diyi为true，清除定时器time
+	if (diyi=true) {
+	clearInterval(time);
+	}
+	// 得到蛇头的坐标
+	var sheL=sheshens[0].offsetLeft;
+	var sheT=sheshens[0].offsetTop;
+	// 点击事件的坐标
+	var event=event||window.event;
+	var X=event.pageX;
+	var Y=event.pageY;
+	// 让蛇每300毫秒行进8px长度，直角三角形定律
+	var left=8*(X-sheL)/Math.sqrt(Math.pow((X-sheL),2)+Math.pow((Y-sheT),2));
+	var tops=8*(Y-sheT)/Math.sqrt(Math.pow((X-sheL),2)+Math.pow((Y-sheT),2));
+	// 设置定时器
+	time = setInterval(autoplay,100);
+	// 定时器函数
+	function autoplay() {
+			// body...
+			// sl、st自加
+		sl=sl+left;
+		st=st+tops;
+		// 将sl、st记录，从sheposl/t数组前面加入
+		sheposl.unshift(sl);
+		shepost.unshift(st);
+		// diyi布尔值为true
+		var diyi=true;
+		// 用for循环遍历从shepos数组中获取坐标，然后赋值给蛇头到蛇尾各个部分，作为它们的当前坐标
+				for (var i = 0; i < sheshens.length; i++) {
+				sheshens[i].style.left=sheposl[i]-4+"px";
+				sheshens[i].style.top=shepost[i]-4+"px";
+		}
+		// sheshens[0].offsetTop检测蛇头的坐标，如果蛇头的坐标跑出橙色区域，则停止计时器，且弹出结束框
+		if (sheshens[0].offsetTop<0||sheshens[0].offsetLeft<0||sheshens[0].offsetTop>390||sheshens[0].offsetLeft>390) {
+			clearInterval(time);
+			over.style.display="block";
+			
+		}
+		// 如果蛇没有跑出橙色区域，当它距离随即出现的那个坐标上下左右相差为8px时，将随机出现的绿色圆点（newdiv）添加到id为蛇的盒子里面，这样蛇身就多了一个单位长度，同时加分1.在调用suiji（）函数创造一个div元素节点，随即出现在橙色区域
+		else if ((sheshens[0].offsetTop-suijit<12&&sheshens[0].offsetTop-suijit>-4)&&(sheshens[0].offsetLeft-suijil<12&&sheshens[0].offsetLeft-suijil>-4)) {
+				she.appendChild(newdiv);
+				fen=fen+1;
+				fenshu.innerHTML="当前分数"+fen;
+				suiji();
+				}
+
+	}
+	// 弹出框中点击next按钮将会刷新页面重新开始
+	next.onclick=function () {
+		window.location.reload();
+	}
+}
+	</script>
+</body>
+</html>
